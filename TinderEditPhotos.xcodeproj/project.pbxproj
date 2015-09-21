@@ -16,6 +16,7 @@
 		CEE7830B1BAD698400816A1B /* TinderEditPhotosTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE7830A1BAD698400816A1B /* TinderEditPhotosTests.m */; };
 		CEE783171BAD6B5400816A1B /* EditInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE783161BAD6B5400816A1B /* EditInfo.m */; };
 		CEE7831B1BAD777300816A1B /* CollectionCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE7831A1BAD777300816A1B /* CollectionCell.m */; };
+		CEE7AF6C1BB02D590012C891 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEE7AF6B1BB02D590012C891 /* AssetsLibrary.framework */; };
 		CEF503CB1BAFC1AB00FE6F55 /* CustomLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF503CA1BAFC1AB00FE6F55 /* CustomLayout.m */; };
 /* End PBXBuildFile section */
 
@@ -47,6 +48,7 @@
 		CEE783161BAD6B5400816A1B /* EditInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EditInfo.m; sourceTree = "<group>"; };
 		CEE783191BAD777300816A1B /* CollectionCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CollectionCell.h; sourceTree = "<group>"; };
 		CEE7831A1BAD777300816A1B /* CollectionCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CollectionCell.m; sourceTree = "<group>"; };
+		CEE7AF6B1BB02D590012C891 /* AssetsLibrary.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AssetsLibrary.framework; path = System/Library/Frameworks/AssetsLibrary.framework; sourceTree = SDKROOT; };
 		CEF503C91BAFC1AB00FE6F55 /* CustomLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomLayout.h; sourceTree = "<group>"; };
 		CEF503CA1BAFC1AB00FE6F55 /* CustomLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomLayout.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -56,6 +58,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CEE7AF6C1BB02D590012C891 /* AssetsLibrary.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -72,6 +75,7 @@
 		CEE782E21BAD698400816A1B = {
 			isa = PBXGroup;
 			children = (
+				CEE7AF6B1BB02D590012C891 /* AssetsLibrary.framework */,
 				CEE782ED1BAD698400816A1B /* TinderEditPhotos */,
 				CEE783071BAD698400816A1B /* TinderEditPhotosTests */,
 				CEE782EC1BAD698400816A1B /* Products */,

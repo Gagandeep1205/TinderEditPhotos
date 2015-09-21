@@ -104,11 +104,17 @@
     
     if (panRecognizer.state == UIGestureRecognizerStateEnded) {
         [self.movingCell removeFromSuperview];
+        CollectionCell *cell = (CollectionCell*)[self.collectionView cellForItemAtIndexPath:_indexPathMovingCell];
+        NSData *data1 = UIImagePNGRepresentation(cell.imgView.image);
+        NSData *data2 = UIImagePNGRepresentation([UIImage imageNamed:@"placeholder"]);
+        if (![data1 isEqual:data2]) {
+
         _indexPathWhereCellStopped = [self.collectionView indexPathForItemAtPoint:locationPoint];
         
         UIImage * temp = [_arrCollectionView objectAtIndex:_indexPathWhereCellStopped.row];
         [_arrCollectionView replaceObjectAtIndex:_indexPathWhereCellStopped.row withObject:[_arrCollectionView objectAtIndex:_indexPathMovingCell.row]];
         [_arrCollectionView replaceObjectAtIndex:_indexPathMovingCell.row withObject:temp];
+        }
     }
     [_collectionView reloadData];
 }
@@ -199,10 +205,20 @@
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
     
-    UIImage *chosenImage = info[UIImagePickerControllerEditedImage];
-    [_arrCollectionView replaceObjectAtIndex:_selectedCellIndex.row withObject:chosenImage];
+    NSURL *refURL = [info valueForKey:UIImagePickerControllerReferenceURL];
+    ALAssetsLibraryAssetForURLResultBlock resultblock = ^(ALAsset *imageAsset)
+    {
+        ALAssetRepresentation *imageRep = [imageAsset defaultRepresentation];
+        NSLog(@"[imageRep filename] : %@", [imageRep filename]);
+        [_arrCollectionView replaceObjectAtIndex:_selectedCellIndex.row withObject:[imageRep filename]];
+        
+    };
+    ALAssetsLibrary* assetslibrary = [[ALAssetsLibrary alloc] init];
+    [assetslibrary assetForURL:refURL resultBlock:resultblock failureBlock:nil];
+    
+    
     [picker dismissViewControllerAnimated:YES completion:NULL];
-    [_collectionView reloadData];
+    
     
 }
 
@@ -211,6 +227,7 @@
     [picker dismissViewControllerAnimated:YES completion:NULL];
     
 }
+
 
 
 @end

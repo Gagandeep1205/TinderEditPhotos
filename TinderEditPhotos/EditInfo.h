@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "CollectionCell.h"
 #import "CustomLayout.h"
+#import <AssetsLibrary/AssetsLibrary.h>
 
 @protocol changeProfilePic <NSObject>
 
