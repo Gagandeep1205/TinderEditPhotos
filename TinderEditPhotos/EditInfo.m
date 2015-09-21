@@ -16,7 +16,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    _arrCollectionView = [[NSMutableArray alloc] initWithObjects:@"1.jpg", @"2.jpg", @"3.jpg", @"4.jpg", @"5.jpg", @"6.jpg", @"placeholder",nil];
+    _arrCollectionView = [[NSMutableArray alloc] initWithObjects:[UIImage imageNamed:@"1.jpg"], [UIImage imageNamed:@"2.jpg"], [UIImage imageNamed:@"3.jpg"], [UIImage imageNamed:@"4.jpg"], [UIImage imageNamed:@"5.jpg"], [UIImage imageNamed:@"6.jpg"], [UIImage imageNamed:@"placeholder"],nil];
     
     if (![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
         
@@ -48,7 +48,7 @@
 
     CollectionCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"CollectionCell" forIndexPath:indexPath];
     
-    cell.imgView.image = [UIImage imageNamed:[_arrCollectionView objectAtIndex:indexPath.item]];
+    cell.imgView.image = [_arrCollectionView objectAtIndex:indexPath.item];
     cell.indexpath = indexPath;
     cell.delegate = self;
     cell.btnClose.layer.cornerRadius = cell.btnClose.frame.size.height/2;
@@ -123,7 +123,7 @@
 #pragma mark - button actions
 
 - (IBAction)actionBtnDone:(id)sender {
-    UIImage * img=[UIImage imageNamed:[_arrCollectionView objectAtIndex:0]];
+    UIImage * img=[_arrCollectionView objectAtIndex:0];
     [self.delegate newData:img];
 
     [self dismissViewControllerAnimated:YES completion:^{
@@ -205,21 +205,10 @@
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
     
-    NSURL *refURL = [info valueForKey:UIImagePickerControllerReferenceURL];
-    ALAssetsLibraryAssetForURLResultBlock resultblock = ^(ALAsset *imageAsset)
-    {
-        ALAssetRepresentation *imageRep = [imageAsset defaultRepresentation];
-        NSLog(@"[imageRep filename] : %@", [imageRep filename]);
-        [_arrCollectionView replaceObjectAtIndex:_selectedCellIndex.row withObject:[imageRep filename]];
-        
-    };
-    ALAssetsLibrary* assetslibrary = [[ALAssetsLibrary alloc] init];
-    [assetslibrary assetForURL:refURL resultBlock:resultblock failureBlock:nil];
-    
-    
+    UIImage *image = [info objectForKey:UIImagePickerControllerOriginalImage];
+    [_arrCollectionView replaceObjectAtIndex:_selectedCellIndex.row withObject:image];
+    [_collectionView reloadData];
     [picker dismissViewControllerAnimated:YES completion:NULL];
-    
-    
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
