@@ -14,6 +14,9 @@
 		CEE782FC1BAD698400816A1B /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CEE782FB1BAD698400816A1B /* Images.xcassets */; };
 		CEE782FF1BAD698400816A1B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = CEE782FD1BAD698400816A1B /* LaunchScreen.xib */; };
 		CEE7830B1BAD698400816A1B /* TinderEditPhotosTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE7830A1BAD698400816A1B /* TinderEditPhotosTests.m */; };
+		CEE783171BAD6B5400816A1B /* EditInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE783161BAD6B5400816A1B /* EditInfo.m */; };
+		CEE7831B1BAD777300816A1B /* CollectionCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE7831A1BAD777300816A1B /* CollectionCell.m */; };
+		CEF503CB1BAFC1AB00FE6F55 /* CustomLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF503CA1BAFC1AB00FE6F55 /* CustomLayout.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,6 +43,12 @@
 		CEE783041BAD698400816A1B /* TinderEditPhotosTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TinderEditPhotosTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CEE783091BAD698400816A1B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CEE7830A1BAD698400816A1B /* TinderEditPhotosTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TinderEditPhotosTests.m; sourceTree = "<group>"; };
+		CEE783151BAD6B5400816A1B /* EditInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditInfo.h; sourceTree = "<group>"; };
+		CEE783161BAD6B5400816A1B /* EditInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EditInfo.m; sourceTree = "<group>"; };
+		CEE783191BAD777300816A1B /* CollectionCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CollectionCell.h; sourceTree = "<group>"; };
+		CEE7831A1BAD777300816A1B /* CollectionCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CollectionCell.m; sourceTree = "<group>"; };
+		CEF503C91BAFC1AB00FE6F55 /* CustomLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomLayout.h; sourceTree = "<group>"; };
+		CEF503CA1BAFC1AB00FE6F55 /* CustomLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomLayout.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -83,8 +92,7 @@
 			children = (
 				CEE782F21BAD698400816A1B /* AppDelegate.h */,
 				CEE782F31BAD698400816A1B /* AppDelegate.m */,
-				CEE782F51BAD698400816A1B /* ViewController.h */,
-				CEE782F61BAD698400816A1B /* ViewController.m */,
+				CEE783141BAD6B2400816A1B /* Controllers */,
 				CEE782F81BAD698400816A1B /* Main.storyboard */,
 				CEE782FB1BAD698400816A1B /* Images.xcassets */,
 				CEE782FD1BAD698400816A1B /* LaunchScreen.xib */,
@@ -117,6 +125,29 @@
 				CEE783091BAD698400816A1B /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		CEE783141BAD6B2400816A1B /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				CEE782F51BAD698400816A1B /* ViewController.h */,
+				CEE782F61BAD698400816A1B /* ViewController.m */,
+				CEE783151BAD6B5400816A1B /* EditInfo.h */,
+				CEE783161BAD6B5400816A1B /* EditInfo.m */,
+				CEE783181BAD775000816A1B /* collectionCell */,
+			);
+			name = Controllers;
+			sourceTree = "<group>";
+		};
+		CEE783181BAD775000816A1B /* collectionCell */ = {
+			isa = PBXGroup;
+			children = (
+				CEE783191BAD777300816A1B /* CollectionCell.h */,
+				CEE7831A1BAD777300816A1B /* CollectionCell.m */,
+				CEF503C91BAFC1AB00FE6F55 /* CustomLayout.h */,
+				CEF503CA1BAFC1AB00FE6F55 /* CustomLayout.m */,
+			);
+			name = collectionCell;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -219,9 +250,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CEF503CB1BAFC1AB00FE6F55 /* CustomLayout.m in Sources */,
 				CEE782F71BAD698400816A1B /* ViewController.m in Sources */,
+				CEE7831B1BAD777300816A1B /* CollectionCell.m in Sources */,
 				CEE782F41BAD698400816A1B /* AppDelegate.m in Sources */,
 				CEE782F11BAD698400816A1B /* main.m in Sources */,
+				CEE783171BAD6B5400816A1B /* EditInfo.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -418,6 +452,7 @@
 				CEE783101BAD698400816A1B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		CEE783111BAD698400816A1B /* Build configuration list for PBXNativeTarget "TinderEditPhotosTests" */ = {
 			isa = XCConfigurationList;
@@ -426,6 +461,7 @@
 				CEE783131BAD698400816A1B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

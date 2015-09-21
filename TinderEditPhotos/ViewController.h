@@ -7,9 +7,18 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "EditInfo.h"
 
-@interface ViewController : UIViewController
+@interface ViewController : UIViewController<changeProfilePic>
 
+@property (weak, nonatomic) IBOutlet UIButton *btnEdit;
+@property (weak, nonatomic) IBOutlet UILabel *labelImage;
+@property (weak, nonatomic) IBOutlet UILabel *labelUsername;
+@property (weak, nonatomic) IBOutlet UILabel *labelAboutUser;
+@property (weak, nonatomic) IBOutlet UIImageView *imgUserProfile;
+@property UIImage *profilePic;
+
+- (IBAction)actionBtnEdit:(id)sender;
 
 @end
 
