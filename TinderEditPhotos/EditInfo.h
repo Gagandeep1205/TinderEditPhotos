@@ -10,6 +10,7 @@
 #import "CollectionCell.h"
 #import "CustomLayout.h"
 #import <AssetsLibrary/AssetsLibrary.h>
+#import <Foundation/Foundation.h>
 
 @protocol changeProfilePic <NSObject>
 
@@ -28,9 +29,11 @@
 @property UIImage *profileImage;
 @property UIImageView *movingCell;
 @property NSMutableArray *arrCollectionView;
+@property NSArray *paths;
 @property NSIndexPath *selectedCellIndex;
 @property NSIndexPath *indexPathMovingCell;
 @property NSIndexPath *indexPathWhereCellStopped;
+@property NSString *myDirectory;
 
 - (IBAction)actionBtnDone:(id)sender;
 
