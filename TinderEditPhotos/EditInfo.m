@@ -16,10 +16,8 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
-        _arrCollectionView = [[NSMutableArray alloc] initWithObjects:@"1.jpg", @"2.jpg", @"3.jpg", @"4.jpg", @"5.jpg", @"6.jpg",nil];
     
-    [self performSelectorInBackground:@selector(saveFilesInDocDirectory:) withObject:_arrCollectionView];
+    [self performSelectorInBackground:@selector(saveFilesInDocDirectory) withObject:nil];
     
     if (![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
         
@@ -30,8 +28,10 @@
                                                     otherButtonTitles: nil];
         [myAlertView show];
     }
-    UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
-    [self.collectionView addGestureRecognizer:pan];
+    
+    UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(startPaning:)];
+    [self.collectionView addGestureRecognizer:longPress];
+    longPress.cancelsTouchesInView = NO;
 }
 
 - (void)didReceiveMemoryWarning {
@@ -39,45 +39,52 @@
     
 }
 
-- (void) saveFilesInDocDirectory : (NSMutableArray *)arr{
+- (void) viewWillDisappear:(BOOL)animated{
+
+    for (int i = 0; i<_arrCollectionView.count; i++) {
+        NSString *path = [_myDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%d",i]];
+        NSData *data = [NSData dataWithContentsOfURL:[NSURL fileURLWithPath:path]];
+        UIImage * img = [UIImage imageWithData:data];
+        [self saveImageAtPath:path ImageData:UIImagePNGRepresentation(img)];
+    }
+}
+
+- (void) saveFilesInDocDirectory{
 
     {
     
     NSError *error;
     NSArray *path = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [path objectAtIndex:0]; // Get documents folder
-    NSString *dataPath = [documentsDirectory stringByAppendingPathComponent:@"/myImages"];
+    NSString *documentsDirectory = [path objectAtIndex:0];
+    NSString *dataPath = [documentsDirectory stringByAppendingPathComponent:@"/tinderImages"];
     
     if (![[NSFileManager defaultManager] fileExistsAtPath:dataPath])
         [[NSFileManager defaultManager] createDirectoryAtPath:dataPath withIntermediateDirectories:NO attributes:nil error:&error];
     
     }
     
-    NSString *path;
     _paths = [[NSArray alloc] init];
     _paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    _myDirectory = [[_paths objectAtIndex:0] stringByAppendingPathComponent:@"myImages"];
-  
+    _myDirectory = [[_paths objectAtIndex:0] stringByAppendingPathComponent:@"tinderImages"];
 
-    for(NSInteger i = 0; i<arr.count; i++){
-        
-        path = [_myDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%ld",(long)i]];
-        UIImage *img = [UIImage imageNamed:[arr objectAtIndex:i]];
-        NSData *data = [NSData dataWithData:UIImagePNGRepresentation(img)];
+     NSArray *directoryContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:_myDirectory error:NULL];
+    
+    _arrCollectionView = [[NSMutableArray alloc] initWithArray:directoryContent];
+    NSLog(@"%@",_arrCollectionView);
+    
+//    NSError *error;
+//    [[NSFileManager defaultManager]removeItemAtPath:_myDirectory error:&error];
 
-        [self saveImageAtPath:path ImageData:data];
-    }
-    [_collectionView reloadData];
+    [_collectionView setDelegate:self];
+    [_collectionView setDataSource:self];
+   [_collectionView reloadData];
 }
 
 #pragma mark - collection view delegates and data sources
 
 - (NSInteger) collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{
 
-    NSArray *array = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:_myDirectory error:nil];
-
-    NSLog(@"%@",array);
-    return array.count;
+    return 6;
 }
 
 - (UICollectionViewCell *) collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
@@ -89,21 +96,18 @@
     cell.btnClose.layer.cornerRadius = cell.btnClose.frame.size.height/2;
     cell.btnClose.clipsToBounds = YES;
     
-    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul);
-    dispatch_async(queue, ^(void) {
+    if (indexPath.row >= _arrCollectionView.count) {
         
-        NSString *path = [_myDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%ld",(long)indexPath.row]];
-        UIImage* image = [[UIImage alloc] initWithData:[self retrieveImageFromPath:path]];
-        if (image) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (cell.tag == indexPath.row) {
-                    cell.imgView.image = image;
-                    NSLog(@"%@",image);
-                    [cell setNeedsLayout];
-                }
-            });
-        }
-    });
+        cell.imgView.image = [UIImage imageNamed:@"placeholder"];
+
+    }
+    else{
+    
+        NSString *filePath = [_myDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%@",[_arrCollectionView objectAtIndex:indexPath.row]]];
+        NSData *data = [NSData dataWithContentsOfURL:[NSURL fileURLWithPath:filePath]];
+        cell.imgView.image = [UIImage imageWithData:data];
+
+    }
     
     return cell;
 }
@@ -134,7 +138,6 @@
     [[NSFileManager defaultManager] createFileAtPath:path
                                             contents:file
                                           attributes:nil];
-    [_collectionView reloadData];
 }
                              
 -(NSData *)retrieveImageFromPath:(NSString *)path
@@ -150,6 +153,8 @@
     else
     {
         NSLog(@"File does not exist");
+         NSData *data2 = UIImagePNGRepresentation([UIImage imageNamed:@"placeholder"]);
+        return data2;
     }
     return nil;
 }
@@ -160,18 +165,16 @@
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
     
     UIImage *image = [info objectForKey:UIImagePickerControllerOriginalImage];
-    NSData *file;
-    file = [NSData dataWithData:UIImagePNGRepresentation(image)];
+    NSData *file = [NSData dataWithData:UIImagePNGRepresentation(image)];
+    
     NSString *path;
-    path = [[_paths objectAtIndex:0] stringByAppendingPathComponent:@"myImages"];
-    path = [path stringByAppendingPathComponent:[NSString stringWithFormat:@"123"]];
-
-    [[NSFileManager defaultManager] createFileAtPath:path
-                                            contents:file
-                                          attributes:nil];
-    NSArray *directoryContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:path error:NULL];
-    [_arrCollectionView replaceObjectAtIndex:_selectedCellIndex.row withObject:[directoryContent objectAtIndex:directoryContent.count]];
-    [_collectionView reloadData];
+    path = [_myDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%ld",(long)_selectedCellIndex.row]];
+    [[NSFileManager defaultManager] removeItemAtPath:path error:NULL];
+    [self saveImageAtPath:path ImageData:file];
+    
+    CollectionCell *cell = (CollectionCell*)[self.collectionView cellForItemAtIndexPath:_selectedCellIndex];
+    cell.imgView.image = image;
+    
     [picker dismissViewControllerAnimated:YES completion:NULL];
 }
 
@@ -186,23 +189,28 @@
 - (void) closeButtonPressed:(NSIndexPath *)indexPath{
     
     _selectedCellIndex = indexPath;
-    if (indexPath.row == 0) {
-        UIActionSheet *actionSheetProfilePic = [[UIActionSheet alloc]
-                                                initWithTitle:nil delegate:self
-                                                cancelButtonTitle:@"cancel"
-                                                destructiveButtonTitle:@"Delete"
-                                                otherButtonTitles:nil];
-        actionSheetProfilePic.tag = 1;
-        [actionSheetProfilePic showInView:self.view];
-    }
-    else {
-        UIActionSheet *actionSheet = [[UIActionSheet alloc]
-                                      initWithTitle:nil delegate:self
-                                      cancelButtonTitle:@"cancel"
-                                      destructiveButtonTitle:@"Delete"
-                                      otherButtonTitles:@"Make Profile Pic", nil];
-        actionSheet.tag = 2;
-        [actionSheet showInView:self.view];
+    CollectionCell * cell = (CollectionCell *)[_collectionView cellForItemAtIndexPath:indexPath];
+    NSData *data1 = UIImagePNGRepresentation(cell.imgView.image);
+    NSData *data2 = UIImagePNGRepresentation([UIImage imageNamed:@"placeholder"]);
+    if (![data1 isEqual:data2]) {
+        if (indexPath.row == 0) {
+            UIActionSheet *actionSheetProfilePic = [[UIActionSheet alloc]
+                                                    initWithTitle:nil delegate:self
+                                                    cancelButtonTitle:@"cancel"
+                                                    destructiveButtonTitle:@"Delete"
+                                                    otherButtonTitles:nil];
+            actionSheetProfilePic.tag = 1;
+            [actionSheetProfilePic showInView:self.view];
+        }
+        else {
+            UIActionSheet *actionSheet = [[UIActionSheet alloc]
+                                          initWithTitle:nil delegate:self
+                                          cancelButtonTitle:@"cancel"
+                                          destructiveButtonTitle:@"Delete"
+                                          otherButtonTitles:@"Make Profile Pic", nil];
+            actionSheet.tag = 2;
+            [actionSheet showInView:self.view];
+        }
     }
 }
 
@@ -234,20 +242,45 @@
         }
     }
     else{
+        CollectionCell *cell = (CollectionCell*)[self.collectionView cellForItemAtIndexPath:_selectedCellIndex];
+        CollectionCell *profileCell = (CollectionCell*)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
         
         if (buttonIndex == 0) {
-            
-            [_arrCollectionView replaceObjectAtIndex:_selectedCellIndex.row withObject:@"placeholder"];
+            NSString *path;
+            path = [_myDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%ld",(long)_selectedCellIndex.row]];
+            cell.imgView.image = [UIImage imageNamed:@"placeholder"];
+            NSError *error;
+            [[NSFileManager defaultManager]removeItemAtPath:path error:&error];
         }
         
         if(buttonIndex == 1){
             
-            UIImage * temp = [_arrCollectionView objectAtIndex:0];
-            [_arrCollectionView insertObject:[_arrCollectionView objectAtIndex:_selectedCellIndex.row] atIndex:0];
-            [_arrCollectionView removeObjectAtIndex:1];
-            [_arrCollectionView replaceObjectAtIndex:_selectedCellIndex.row withObject:temp];
+//            NSString *profilePath = [_myDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%@",[_arrCollectionView objectAtIndex:0]]];
+//            NSData *profileTemp = [NSData dataWithContentsOfURL:[NSURL fileURLWithPath:profilePath]];
+//            NSError *error;
+//            [[NSFileManager defaultManager]removeItemAtPath:profilePath error:&error];
+//            
+//            
+//            NSString *path = [_myDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%ld",(long)_selectedCellIndex.row]];
+//            NSData *temp = [NSData dataWithContentsOfURL:[NSURL fileURLWithPath:path]];
+//            [[NSFileManager defaultManager]removeItemAtPath:path error:&error];
+//            
+//            [self saveImageAtPath:path ImageData:UIImagePNGRepresentation(profileCell.imgView.image)];
+//            [self saveImageAtPath:profilePath ImageData:UIImagePNGRepresentation(cell.imgView.image)];
+            
+//            NSArray *directoryContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:_myDirectory error:NULL];
+//            _arrCollectionView = [[NSMutableArray alloc] initWithArray:directoryContent];
+//            NSLog(@"%@",_arrCollectionView);
+
+            UIImage *imgTemp = profileCell.imgView.image;
+            NSString *strTemp = [_arrCollectionView objectAtIndex:0];
+            
+            profileCell.imgView.image = cell.imgView.image;
+            cell.imgView.image = imgTemp;
+            
+            [_arrCollectionView replaceObjectAtIndex:0 withObject:[_arrCollectionView objectAtIndex:_selectedCellIndex.row]];
+            [_arrCollectionView replaceObjectAtIndex:_selectedCellIndex.row withObject:strTemp];
         }
-        [_collectionView reloadData];
     }
 }
 
@@ -255,7 +288,12 @@
 #pragma mark - button actions
 
 - (IBAction)actionBtnDone:(id)sender {
-    UIImage * img= [UIImage imageNamed:[_arrCollectionView objectAtIndex:0]];
+    
+    
+    NSString *filePath = [_myDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%@",[_arrCollectionView objectAtIndex:0]]];
+    NSData *data = [NSData dataWithContentsOfURL:[NSURL fileURLWithPath:filePath]];
+    UIImage *img = [UIImage imageWithData:data];
+    
     [self.delegate newData:img];
     
     [self dismissViewControllerAnimated:YES completion:^{
@@ -266,45 +304,71 @@
 
 - (void)handlePan:(UIPanGestureRecognizer *)panRecognizer {
     
-    CGPoint locationPoint = [panRecognizer locationInView:self.collectionView];
-    
-    if (panRecognizer.state == UIGestureRecognizerStateBegan) {
-        
-        _indexPathMovingCell = [self.collectionView indexPathForItemAtPoint:locationPoint];
-        CollectionCell *cell = (CollectionCell*)[self.collectionView cellForItemAtIndexPath:_indexPathMovingCell];
-        
-        UIGraphicsBeginImageContext(cell.bounds.size);
-        [cell.layer renderInContext:UIGraphicsGetCurrentContext()];
-        UIImage *cellImage = UIGraphicsGetImageFromCurrentImageContext();
-        UIGraphicsEndImageContext();
-        
-        self.movingCell = [[UIImageView alloc] initWithImage:cellImage];
-        [self.movingCell setCenter:locationPoint];
-        [self.collectionView addSubview:self.movingCell];
-        
     }
+
+#pragma mark long press gesture recogniser 
+
+- (void)startPaning : (UILongPressGestureRecognizer *)longPress {
     
-    if (panRecognizer.state == UIGestureRecognizerStateChanged) {
-        [self.movingCell setCenter:locationPoint];
+    
+    CGPoint locationPoint = [longPress locationInView:self.collectionView];
+    _indexPathMovingCell = [self.collectionView indexPathForItemAtPoint:locationPoint];
+    CollectionCell *cellBegin = (CollectionCell*)[self.collectionView cellForItemAtIndexPath:_indexPathMovingCell];
+    
+    NSData *data1 = UIImagePNGRepresentation(cellBegin.imgView.image);
+    NSData *data2 = UIImagePNGRepresentation([UIImage imageNamed:@"placeholder"]);
+    if (![data1 isEqual:data2]) {
         
-    }
-    
-    if (panRecognizer.state == UIGestureRecognizerStateEnded) {
-        [self.movingCell removeFromSuperview];
-        CollectionCell *cell = (CollectionCell*)[self.collectionView cellForItemAtIndexPath:_indexPathMovingCell];
-        NSData *data1 = UIImagePNGRepresentation(cell.imgView.image);
-        NSData *data2 = UIImagePNGRepresentation([UIImage imageNamed:@"placeholder"]);
-        if (![data1 isEqual:data2]) {
+        
+        if (longPress.state == UIGestureRecognizerStateBegan) {
             
+            UIGraphicsBeginImageContext(cellBegin.bounds.size);
+            [cellBegin.layer renderInContext:UIGraphicsGetCurrentContext()];
+            UIImage *cellImage = UIGraphicsGetImageFromCurrentImageContext();
+            UIGraphicsEndImageContext();
+            [cellBegin setHidden:YES];
+            
+            self.movingCell = [[UIImageView alloc] initWithImage:cellImage];
+            [self popCell:0.1 :self.movingCell];
+            [self.movingCell setCenter:locationPoint];
+            [self.collectionView addSubview:self.movingCell];
+            
+        }
+        
+        if (longPress.state == UIGestureRecognizerStateChanged) {
+            [self.movingCell setCenter:locationPoint];
+            NSIndexPath *indexPathInBetween = [self.collectionView indexPathForItemAtPoint:locationPoint];
+            
+        }
+        
+        if (longPress.state == UIGestureRecognizerStateEnded) {
+            [self.movingCell removeFromSuperview];
             _indexPathWhereCellStopped = [self.collectionView indexPathForItemAtPoint:locationPoint];
+            CollectionCell *cellEnd = (CollectionCell*)[self.collectionView cellForItemAtIndexPath:_indexPathWhereCellStopped];
             
-            UIImage * temp = [_arrCollectionView objectAtIndex:_indexPathWhereCellStopped.row];
-            [_arrCollectionView replaceObjectAtIndex:_indexPathWhereCellStopped.row withObject:[_arrCollectionView objectAtIndex:_indexPathMovingCell.row]];
-            [_arrCollectionView replaceObjectAtIndex:_indexPathMovingCell.row withObject:temp];
+            UIImage *imgTemp = cellBegin.imgView.image;
+            NSString *strTemp = [_arrCollectionView objectAtIndex:_indexPathMovingCell.row];
+            
+            cellBegin.imgView.image = cellEnd.imgView.image;
+            cellEnd.imgView.image = imgTemp;
+            
+            [_arrCollectionView replaceObjectAtIndex:_indexPathMovingCell.row withObject:[_arrCollectionView objectAtIndex:_indexPathWhereCellStopped.row]];
+            [_arrCollectionView replaceObjectAtIndex:_indexPathWhereCellStopped.row withObject:strTemp];
+            
+            [cellBegin setHidden:NO];
         }
     }
-    [_collectionView reloadData];
 }
+
+#pragma mark - animations
+
+- (void) popCell:(float)secs : (UIImageView*)image{
+    
+    [UIView animateWithDuration:0.05 animations:^{
+        image.transform = CGAffineTransformMakeScale(1.15, 1.15);
+    }];
+}
+
 
 
 

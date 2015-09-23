@@ -27,7 +27,7 @@
 
 - (void) configureUI{
 
-    _imgUserProfile.image = _profilePic;
+    _imgUserProfile.image = [UIImage imageNamed:@"placeholder"];
     _btnEdit.layer.cornerRadius = 2;
     _btnEdit.layer.borderColor = (__bridge CGColorRef)([UIColor blackColor]);
     _btnEdit.layer.borderWidth = 1;
@@ -45,7 +45,7 @@
     if ([segue.identifier isEqual:@"segueEdit"]) {
 
         EditInfo *VC = [segue destinationViewController];
-        VC.profileImage =_profilePic;
+//        VC.profileImage = [UIImage imageNamed:@"placeholder"];
         VC.delegate = self;
     }
 }
@@ -54,12 +54,17 @@
 
 - (void) newData:(UIImage *)image{
 
-    NSLog(@"%@",image);
+    if ([image isEqual:NULL]) {
+        self.imgUserProfile.image = [UIImage imageNamed:@"placeholder"];
+    }
     _profilePic = [[UIImage alloc] init];
     _profilePic = image;
     self.imgUserProfile.image = image;
 
 }
+
+
+
 
 
 @end

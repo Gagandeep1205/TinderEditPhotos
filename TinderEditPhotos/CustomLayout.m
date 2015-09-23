@@ -83,7 +83,7 @@ static NSString * const CustomLayoutCollectionCellKind = @"CellLayout";
         
         return CGRectMake(220,110,100,100);
     }
-    else if (indexPath.row == 3){
+    else if (indexPath.row == 5){
         
         return CGRectMake(0,220,100,100);
     }
